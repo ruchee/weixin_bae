@@ -162,10 +162,20 @@ class WeixinCallback {
         $keyword = trim($object->Content);
 
         if (preg_match('/^天气.+/', $keyword)) {
-            // 新浪天气预报
+            // 新浪天气
             include __DIR__.'/weather.php';
             $city = mb_substr($keyword, 2, mb_strlen($keyword)-2, 'utf-8');
             $content = weather($city);
+        } elseif (preg_match('/^百科.+/', $keyword)) {
+            // 百度百科
+            include __DIR__.'/baike.php';
+            $words = mb_substr($keyword, 2, mb_strlen($keyword), 'utf-8');
+            $content = getEncyclopediaInfo($words);
+        } elseif (preg_match('/^人品.+/', $keyword)) {
+            // 测试人品
+            include __DIR__.'/renpin.php';
+            $name = mb_substr($keyword, 2, mb_strlen($keyword), 'utf-8');
+            $content = getRenPin($name);
         } else {
             switch ($keyword) {
             case '占卜':
@@ -177,6 +187,8 @@ class WeixinCallback {
                 // 随机笑话
                 $url = 'http://api100.duapp.com/joke/?appkey=trialuser';
                 $content = json_decode(file_get_contents($url), true);
+                $content = explode('<a', $content);
+                $content = trim($content[0]);
                 break;
             default:
                 // xiaoi机器人
